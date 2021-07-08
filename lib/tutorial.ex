@@ -24,14 +24,19 @@ defmodule Tutorial do
   def getHeader(url \\ "https://developer.mozilla.org/fr/") do
 
     {:ok, requestBody} = Crawly.fetch(url).body |> Floki.parse_document
-    pageHead = requestBody |> Floki.find("head")
 
-    # Si la balise head n'est pas  Alors rechercher les balise de métadonnées
-    if pageHead === [] do
-      _metadonnee = requestBody |> Floki.find("meta, link, style, script")
-    else
-      pageHead
-    end
+    [title] = requestBody |> Floki.find("meta[property='og:title']") |> Floki.attribute("content")
+    [description] = requestBody |> Floki.find("meta[name='description']") |> Floki.attribute("content")
+    [og_image] = requestBody |> Floki.find("meta[property='og:image']") |> Floki.attribute("content")
+    [og_description] = requestBody |> Floki.find("meta[property='og:description']") |> Floki.attribute("content")
+
+    res = %{
+      title: title,
+      description: description,
+      og_image: og_image,
+      og_description: og_description
+    }
+
 
   end
 end
