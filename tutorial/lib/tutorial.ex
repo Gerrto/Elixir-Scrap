@@ -17,13 +17,24 @@ defmodule Tutorial do
   end
 
   # L'URL par defaut est l'adresse de google.fr
+  # TODO tester adr complexe : https://twitter.com/Gerrto12
   def getHeader(url \\ "https://www.google.fr/") do
-    # Traitement de l'URI
-    url = URI.decode(url) |> URI.parse()
+
     # Crawly.fetch est une méthode qui va recuperer via un URL
-    # reponse est un liste des métadonnée de la page
-    response = Crawly.fetch(url).headers
-    #valeur de retour de la fonction
-    response
+    # reponse correspond au corp de la reponse a savoir la page web (code HTML)
+    {:ok, pbody} = Crawly.fetch(url).body |> Floki.parse_document
+    # phead correspond au head (balise head) de la page
+    phead = pbody |> Floki.find("head")
+
+    if phead === [] do
+      # Si la balise head n'est pas trouver
+      # Alors rechercher les balise de métadonnées
+      phead = pbody |> Floki.find("meta, link, style, script")
+    else
+      # valeur de retour de la fonction
+      phead
+    end
+
+
   end
 end
