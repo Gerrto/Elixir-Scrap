@@ -21,7 +21,7 @@ defmodule Tutorial do
     retourne les métadonnées de la page (le head ou les information situé dans le head)
   """
   # TODO tester adr complexe : https://twitter.com/Gerrto12
-  def getHeader(url \\ "https://developer.mozilla.org/fr/") do
+  def get_metadata(url \\ "https://developer.mozilla.org/fr/") do
 
     {:ok, requestBody} = Crawly.fetch(url).body |> Floki.parse_document
 
