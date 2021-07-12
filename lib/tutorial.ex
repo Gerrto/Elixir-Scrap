@@ -34,34 +34,43 @@ defmodule Tutorial do
   def get_metadata(url \\ "https://developer.mozilla.org/fr/") do
 
     if String.valid?(url) do
-      {:ok, requestBody} = Crawly.fetch(url).body |> Floki.parse_document
 
-      titre = requestBody |> Floki.find("meta[property='og:title']")
-      if titre == [] do
-        titre = requestBody |> Floki.find("title")
-      end
-      description = requestBody |> Floki.find("meta[name='description']")
-      og_image = requestBody |> Floki.find("meta[property='og:image']")
-      og_description = requestBody |> Floki.find("meta[property='og:description']")
+      if URI.parse(url).host != nil do
 
-      titre = formalisation(titre)
-      description = formalisation(description)
-      og_image = formalisation(og_image)
-      og_description = formalisation(og_description)
+        {:ok, requestBody} = Crawly.fetch(url).body |> Floki.parse_document
 
-      res = %{
-        title: titre,
-        description: description,
-        og_image: og_image,
-        og_description: og_description
-      }
+        titre = requestBody |> Floki.find("meta[property='og:title']")
+        if titre == [] do
+          titre = requestBody |> Floki.find("title")
+        end
+        description = requestBody |> Floki.find("meta[name='description']")
+        og_image = requestBody |> Floki.find("meta[property='og:image']")
+        og_description = requestBody |> Floki.find("meta[property='og:description']")
 
-      if res == %{description: [], og_description: [], og_image: [], title: []} do
-        res = requestBody |> Floki.find("head")
+        titre = formalisation(titre)
+        description = formalisation(description)
+        og_image = formalisation(og_image)
+        og_description = formalisation(og_description)
+
+        res = %{
+          title: titre,
+          description: description,
+          og_image: og_image,
+          og_description: og_description
+        }
+
+        if res == %{description: [], og_description: [], og_image: [], title: []} do
+          res = requestBody |> Floki.find("head")
+        else
+          res
+        end
+
       else
-        res
+        # est une String mais pas un URL
+        nil
       end
     else
+      # est pas une string
       nil
     end
   end
